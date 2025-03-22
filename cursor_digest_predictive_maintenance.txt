@@ -1,0 +1,102 @@
+# Predictive Maintenance RUL - Cursor Digest
+
+## Objective
+Predict the Remaining Useful Life (RUL) of engines using multivariate time-series data. Additionally, classify whether an engine is nearing failure.
+
+---
+
+## Dataset Structure
+- **train_FD001.txt**: Full run-to-failure trajectories.
+- **test_FD001.txt**: Partial sequences that stop before failure.
+- **RUL_FD001.txt**: True RUL values for test set engines.
+- **Columns**:
+  1. engine_id
+  2. time_in_cycles
+  3-5: operational_settings
+  6-26: sensor readings
+
+---
+
+## Processing Pipeline
+
+### 1. Load Data
+```python
+pd.read_csv('train_FD001.txt', sep=' ', header=None)
+```
+
+### 2. Compute RUL
+```python
+train['RUL'] = train.groupby('engine_id')['time_in_cycles'].transform('max') - train['time_in_cycles']
+```
+
+### 3. Feature Engineering
+- Drop constant sensors.
+- Select informative sensors: e.g., sensor_2, sensor_3, sensor_4, sensor_7, ...
+- Normalize with MinMaxScaler.
+
+### 4. Labeling for Classification
+```python
+train['label'] = train['RUL'].apply(lambda x: 1 if x <= 30 else 0)
+```
+
+---
+
+## Modeling
+
+### Regression Models
+- Linear Regression
+- Random Forest Regressor
+- Gradient Boosting Regressor
+
+### Classification Models
+- Logistic Regression
+- Random Forest Classifier
+- XGBoost Classifier
+
+### Neural Network (optional)
+- LSTM-based RUL prediction
+- Sequence-to-one model (timesteps of sensor values)
+
+---
+
+## Evaluation
+### Regression
+- RMSE
+- Plot predicted vs actual RUL
+
+### Classification
+- Accuracy
+- Confusion Matrix
+- Precision, Recall
+
+---
+
+## Suggested Terminal Commands
+```bash
+# View the data
+head train_FD001.txt
+
+# Count engines in training set
+cut -d' ' -f1 train_FD001.txt | sort | uniq | wc -l
+
+# Launch Jupyter to explore interactively
+jupyter notebook
+
+# Train a simple model (if scripts are modularized)
+python train_regression.py
+python train_classification.py
+
+# Run a notebook conversion
+jupyter nbconvert --to script nasa-predictive-maintenance-rul.ipynb
+```
+
+---
+
+## Project Flow Summary
+```text
+Raw Data 
+→ RUL Calculation 
+→ Feature Selection & Scaling 
+→ Train Regression & Classification Models 
+→ Evaluate & Plot Results
+```

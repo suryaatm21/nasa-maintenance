@@ -1,0 +1,12 @@
+venv/
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.bmp
+*.tiff
+*.ico
+.DS_Store
+CMaps/
+nasa-predictive-mainenance-rul.ipynb
+.cursorignore
